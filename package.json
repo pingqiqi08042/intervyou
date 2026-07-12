@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "test": "npx tsx scripts/test-prompt.ts",
     "db:push": "npx prisma db push",

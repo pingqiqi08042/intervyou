@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Resume {
+  id            String             @id @default(cuid())
+  fileName      String
+  rawText       String
+  parsedData    String             // JSON string
+  jdText        String             @default("") // Job Description
+  jdTitle       String             @default("") // 岗位名称
+  diagnosisData String             @default("") // JSON - 最新诊断结果
+  createdAt     DateTime           @default(now())
+  sessions      InterviewSession[]
+}
+
+model InterviewSession {
+  id            String         @id @default(cuid())
+  resumeId      String
+  resume        Resume         @relation(fields: [resumeId], references: [id])
+  mode          String         // resume_deep_dive | behavioral | technical | comprehensive
+  difficulty    String         // friendly | standard | pressure
+  status        String         @default("in_progress") // in_progress | completed
+  currentPhase  String?        // opening | self_intro | resume_deep | behavioral_q | situational | reverse_q | closing
+  questionIndex Int            @default(0)
+  messages      Message[]
+  feedback      Feedback?
+  createdAt     DateTime       @default(now())
+  completedAt   DateTime?
+}
+
+model Message {
+  id        String           @id @default(cuid())
+  sessionId String
+  session   InterviewSession @relation(fields: [sessionId], references: [id])
+  role      String           // interviewer | candidate | system
+  content   String
+  metadata  String?          // JSON — 内部评估数据
+  createdAt DateTime         @default(now())
+}
+
+model Feedback {
+  id              String           @id @default(cuid())
+  sessionId       String           @unique
+  session         InterviewSession @relation(fields: [sessionId], references: [id])
+  overallScore    Int              @default(0)
+  dimensionScores String           // JSON
+  strengths       String           // JSON
+  improvements    String           // JSON
+  fullReport      String           // Markdown
+  createdAt       DateTime         @default(now())
+}

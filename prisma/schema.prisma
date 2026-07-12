@@ -3,9 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// 本地开发可改为 sqlite：
+//   datasource db { provider = "sqlite" url = "file:./dev.db" }
 
 model Resume {
   id            String             @id @default(cuid())

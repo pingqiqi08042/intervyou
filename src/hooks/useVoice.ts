@@ -36,7 +36,7 @@ export function useVoice() {
     const rec = new SpeechRecognition();
     rec.lang = 'zh-CN';
     rec.interimResults = true;
-    rec.continuous = false; // false = auto-stop after silence, more reliable
+    rec.continuous = true; // 持续监听，用户手动点击停止
     rec.maxAlternatives = 1;
 
     let finalText = '';

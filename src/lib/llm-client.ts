@@ -84,25 +84,23 @@ export async function chat(params: {
   userApiKey?: string;
   userProvider?: string;
 }): Promise<LlmResponse> {
-  const serverConfig = getLlmConfig();
-
-  // 部署模式：强制要求用户提供自己的 Key
+  // 部署模式：强制要求用户提供自己的 Key（先检查用户 Key，避免触发服务端 Key 报错）
   const requireUserKey = process.env.REQUIRE_USER_KEY === 'true';
   if (requireUserKey && !params.userApiKey) {
     throw new Error('请先在左侧「API 配置」中填入你的 API Key（DeepSeek 免费注册即可获取）');
   }
 
-  // 用户 Key 覆盖服务端配置
-  const config: LlmConfig = params.userApiKey
+  // 用户 Key 优先，没有则回退服务端 Key
+  const serverConfig = params.userApiKey ? null : getLlmConfig() as LlmConfig | null;
+
+  const config = (params.userApiKey
     ? {
-        provider: (params.userProvider || serverConfig.provider) as Provider,
+        provider: (params.userProvider || serverConfig?.provider || 'deepseek') as Provider,
         apiKey: params.userApiKey,
-        model: serverConfig.model,
-        baseUrl:
-          DEFAULT_BASE_URLS[params.userProvider as Provider] ||
-          serverConfig.baseUrl,
+        model: serverConfig?.model || 'deepseek-chat',
+        baseUrl: DEFAULT_BASE_URLS[params.userProvider as Provider] || serverConfig?.baseUrl || 'https://api.deepseek.com',
       }
-    : serverConfig;
+    : serverConfig!) as LlmConfig;
 
   if (config.provider === 'claude') {
     return chatWithClaude(config, params);

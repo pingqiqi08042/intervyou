@@ -52,6 +52,10 @@ export default function HistoryPage() {
                 <div><span className="font-medium text-sm">{s.name}</span><span className="text-gray-400 text-xs ml-2">{MODE_LABELS[s.mode] || s.mode} · {s.difficulty}</span></div>
                 <div className="flex items-center gap-3">
                   {s.score != null && <span className="text-sm font-bold text-blue-600">{s.score}</span>}
+                  {s.status === 'completed' && (
+                    <button onClick={(e) => { e.stopPropagation(); router.push(`/review/${s.id}`); }}
+                      className="text-xs text-gray-400 hover:text-blue-500 px-1.5 py-0.5 rounded hover:bg-blue-50 transition-colors">回看</button>
+                  )}
                   <span className={`text-xs px-2 py-0.5 rounded ${s.status === 'completed' ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-blue-600'}`}>{s.status === 'completed' ? '已完成' : '继续面试'}</span>
                 </div>
               </div>

@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
         resumeId,
         mode,
         difficulty,
+        jobRole: jobRole || 'auto',
         status: 'in_progress',
         currentPhase: response.metadata?.phase || 'opening',
         questionIndex: 1,

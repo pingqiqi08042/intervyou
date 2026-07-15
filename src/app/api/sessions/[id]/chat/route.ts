@@ -54,6 +54,7 @@ export async function POST(
       userAnswer: content,
       jdText: session.resume.jdText || undefined,
       jdTitle: session.resume.jdTitle || undefined,
+      jobRole: session.jobRole || undefined,
       userApiKey: userKey.apiKey,
       userProvider: userKey.provider,
     });

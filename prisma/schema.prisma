@@ -26,10 +26,11 @@ model InterviewSession {
   id            String         @id @default(cuid())
   resumeId      String
   resume        Resume         @relation(fields: [resumeId], references: [id])
-  mode          String         // resume_deep_dive | behavioral | technical | comprehensive
-  difficulty    String         // friendly | standard | pressure
-  status        String         @default("in_progress") // in_progress | completed
-  currentPhase  String?        // opening | self_intro | resume_deep | behavioral_q | situational | reverse_q | closing
+  mode          String
+  difficulty    String
+  jobRole       String         @default("auto") // 面试时选择的岗位
+  status        String         @default("in_progress")
+  currentPhase  String?
   questionIndex Int            @default(0)
   messages      Message[]
   feedback      Feedback?

@@ -62,6 +62,7 @@ export async function GET(
     const feedback = await generateFeedback({
       resume: parsedData,
       conversationText,
+      jobRole: session.jobRole || 'auto',
       userApiKey: userKey.apiKey,
       userProvider: userKey.provider,
     });

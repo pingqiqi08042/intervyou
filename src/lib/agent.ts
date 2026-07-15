@@ -146,10 +146,15 @@ export async function generateInterviewResponse(params: {
 export async function generateFeedback(params: {
   resume: ParsedResume;
   conversationText: string;
+  jobRole?: string;
   userApiKey?: string;
   userProvider?: string;
 }): Promise<any> {
-  const systemPrompt = FEEDBACK_SYSTEM_PROMPT;
+  const roleContext = params.jobRole && params.jobRole !== 'auto'
+    ? `\n## 面试岗位：${params.jobRole}\n请基于该岗位的核心能力要求进行复盘评价。例如：产品经理应重点评估需求分析、用户洞察、数据驱动、跨团队协作；后端开发应重点评估技术深度、系统设计、性能优化。`
+    : '';
+
+  const systemPrompt = FEEDBACK_SYSTEM_PROMPT.replace('## 核心原则', roleContext + '\n## 核心原则');
 
   const response = await chat({
     systemPrompt,

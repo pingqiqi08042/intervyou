@@ -73,12 +73,17 @@ export async function POST(
     const prevQuestions = session.messages
       .filter((m) => m.role === 'interviewer')
       .map((m) => m.content);
+    // 检测重复：完全一样 OR 前 15 字一样 OR 语义高度相似
     const isRepeat = prevQuestions.length >= 2 &&
-      prevQuestions.some(
-        (q) => q.substring(0, 15) === reply.substring(0, 15)
-      );
+      prevQuestions.some((q) => {
+        const shortQ = q.substring(0, 20);
+        const shortR = reply.substring(0, 20);
+        return shortQ === shortR ||
+          (shortQ.includes('负责了哪些') && shortR.includes('负责了哪些')) ||
+          (shortQ.includes('展开说说') && shortR.includes('展开说说'));
+      });
     if (isRepeat) {
-      // 从简历中找下一个尚未深挖的经历作为具体换题方向
+      // 从简历中找下一个尚未深挖的经历
       try {
         const resume = JSON.parse(session.resume.parsedData);
         const allExps = [...(resume.experiences || []), ...(resume.projects || [])];
@@ -87,12 +92,14 @@ export async function POST(
           !mentioned.includes(e.company || e.name || '')
         );
         if (next) {
-          reply = `好的，了解了。我们聊聊你在${next.company || next.name}的经历吧，能简单介绍一下吗？`;
+          const name = next.company || next.name || '';
+          reply = `好的，了解了。我们聊聊你在${name}的经历吧，能简单介绍一下吗？`;
         } else {
-          reply = '好的，那换个方向。你在学校里有没有做过什么项目？可以分享一下。';
+          // 所有经历都聊过了，进入反问环节
+          reply = '好的，关于你的经历我了解得差不多了。我的问题问完了，你有什么想问我的吗？';
         }
       } catch {
-        reply = '好的，了解了。你简历上还有其他经历，挑一段你觉得最有亮点的讲讲吧。';
+        reply = '好的，我的问题问完了，你有什么想问我的吗？';
       }
     }
 

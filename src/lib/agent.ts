@@ -28,6 +28,7 @@ export async function generateInterviewResponse(params: {
   const systemPrompt = buildSystemPromptV2({
     resume: params.resume,
     mode: params.difficulty, // guided / standard / pressure
+    interviewMode: params.mode, // resume_deep_dive / behavioral / comprehensive
     questionIndex: params.questionIndex,
     currentPhase: params.currentPhase,
     jdText: params.jdText,

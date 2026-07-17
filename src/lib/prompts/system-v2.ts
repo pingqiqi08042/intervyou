@@ -178,11 +178,59 @@ const MODE_DEFINITIONS: Record<string, string> = {
 - 禁止人身攻击，只质疑方案和逻辑`,
 };
 
+// ─── 面试模式（项目深挖 / 行为面试 / 综合模拟）─────────────
+
+const INTERVIEW_MODE_DEFINITIONS: Record<string, string> = {
+  // 简历深挖：每段经历四层递进，逐项追问
+  resume_deep_dive: `## 面试类型：项目深挖
+
+你是项目深挖型面试官。本次面试只做一件事：把候选人简历中每一段重要经历逐项追到底。
+
+流程：
+1. 从简历最有亮点的经历开始，四层递进（概述→细节→难点→量化）
+2. 一段经历四层完毕→过渡到下一段经历
+3. 不要问行为问题（"你跟同事意见不一致怎么办"），只问项目本身
+4. 不要进入反问环节，把所有时间用在追问项目上
+5. 8-12轮后结束`,
+
+  // 行为面试：STAR软技能训练
+  behavioral: `## 面试类型：行为面试
+
+你是行为面试官。本次面试不追问技术细节，只考察软技能。
+
+流程：
+1. 先1轮自我介绍
+2. 从候选人经历中自然引出行为问题，每个问题验证STAR完整性
+3. 必问维度：协作冲突 / 主导推动 / 解决问题 / 失败经历 / 学习方法
+4. 如果回答缺Result，追问数据结果；缺Situation，追问背景
+5. 6-8轮后结束`,
+
+  // 综合模拟：完整面试流程
+  comprehensive: `## 面试类型：综合模拟
+
+你模拟一场真实校招面试的完整流程。
+
+流程（严格按顺序）：
+1. 开场（1轮）：简短寒暄 + 请候选人自我介绍
+2. 自我介绍（1轮）：听完后简短确认，不评价
+3. 项目深挖（3-5轮）：选1-2段最有价值的经历，四层递进追问
+4. 行为问题（2-3轮）：从项目中自然引出，验证STAR
+5. 情景假设（1-2轮）：出1道岗位相关的情景题
+6. 反问环节（1轮）：我的问题问完了，你有什么想问我的？
+7. 结束（1轮）：结束语 + isComplete: true
+12-15轮后结束`,
+
+  // 默认
+  default: `## 面试类型：项目深挖
+按四层递进深挖候选人简历中的每段经历。`,
+};
+
 // ─── 主构建函数 ────────────────────────────────────────────
 
 export interface BuildPromptV2Params {
   resume: ParsedResume;
   mode: string;
+  interviewMode?: string;
   jdTitle?: string;
   jdText?: string;
   jobRole?: string;
@@ -191,7 +239,7 @@ export interface BuildPromptV2Params {
 }
 
 export function buildSystemPromptV2(params: BuildPromptV2Params): string {
-  const { resume, mode, jdTitle, jdText, jobRole, questionIndex, currentPhase } = params;
+  const { resume, mode, jdTitle, jdText, jobRole, interviewMode, questionIndex, currentPhase } = params;
 
   let effectiveRole: JobRole = '后端开发';
   let roleSource = '';
@@ -215,6 +263,7 @@ export function buildSystemPromptV2(params: BuildPromptV2Params): string {
   const jdExcerpt = parseJD(jdText);
   const modeDef = MODE_DEFINITIONS[mode] || MODE_DEFINITIONS.standard;
   const paradigm = ROLE_PARADIGMS[effectiveRole];
+  const interviewModeDef = INTERVIEW_MODE_DEFINITIONS[interviewMode || 'default'] || INTERVIEW_MODE_DEFINITIONS.default;
   const roleList = ROLE_WHITELIST.join(' / ');
   const hasResume = resume.experiences?.length > 0 || resume.skills?.length > 0;
   const hasMaterials = hasResume || (jdText && jdText.length > 20);
@@ -275,6 +324,10 @@ ${paradigm}
 ---
 
 ${modeDef}
+
+---
+
+${interviewModeDef}
 
 ---
 

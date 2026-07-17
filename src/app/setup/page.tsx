@@ -5,10 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/fetch-with-key';
 
 const MODES = [
-  { key: 'resume_deep_dive', label: '简历深挖', desc: '针对每段经历追问到底', rounds: '8-12 轮' },
-  { key: 'behavioral', label: '行为面试', desc: 'STAR 法则专项训练', rounds: '6-8 轮' },
-  { key: 'technical', label: '技术面试', desc: '技术深度 + 项目选型', rounds: '8-10 轮' },
-  { key: 'comprehensive', label: '综合模拟', desc: '全流程真实模拟', rounds: '12-15 轮' },
+  { key: 'resume_deep_dive', label: '简历深挖', desc: '每段经历四层递进追问', rounds: '8-12 轮' },
+  { key: 'behavioral', label: '行为面试', desc: 'STAR 软技能专项训练', rounds: '6-8 轮' },
+  { key: 'comprehensive', label: '综合模拟', desc: '全流程真实面试', rounds: '12-15 轮' },
 ];
 
 const DIFFICULTIES = [

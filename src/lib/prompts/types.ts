@@ -31,6 +31,7 @@ export interface ParsedResume {
     techStack?: string[];
   }[];
   skills: string[];
+  jobIntent?: string; // 简历中的求职意向
   projects: {
     name: string;
     role: string;

@@ -36,7 +36,13 @@ function normalizeRole(input: string): JobRole | null {
 
 // ─── 自动检测 ──────────────────────────────────────────────
 
-function detectJobRole(resume: ParsedResume, jdTitle?: string, jdText?: string): { role: JobRole; confidence: number } {
+function detectJobRole(resume: ParsedResume, jdTitle?: string, jdText?: string): { role: JobRole; confidence: number; fromIntent?: boolean } {
+  // 最高优先级：简历中的求职意向
+  if (resume.jobIntent) {
+    const normalized = normalizeRole(resume.jobIntent);
+    if (normalized) return { role: normalized, confidence: 3, fromIntent: true };
+  }
+
   const allText = [
     resume.experiences.map((e) => e.description + ' ' + (e.role || '')).join(' '),
     resume.projects.map((p) => p.description + ' ' + (p.name || '')).join(' '),
@@ -255,9 +261,13 @@ export function buildSystemPromptV2(params: BuildPromptV2Params): string {
   if (!roleSource) {
     const detected = detectJobRole(resume, jdTitle, jdText);
     effectiveRole = detected.role;
-    roleSource = detected.confidence === 0
-      ? '自动识别（置信度低，建议手动指定）'
-      : detected.confidence === 1 ? '自动识别（可能准确）' : '自动识别（高置信度）';
+    if (detected.fromIntent) {
+      roleSource = '来自简历求职意向';
+    } else {
+      roleSource = detected.confidence === 0
+        ? '自动识别（置信度低，建议手动指定）'
+        : detected.confidence === 1 ? '自动识别（可能准确）' : '自动识别（高置信度）';
+    }
   }
 
   const jdExcerpt = parseJD(jdText);

@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/fetch-with-key';
 
 const MODES = [
   { key: 'resume_deep_dive', label: '简历深挖', desc: '每段经历四层递进追问', rounds: '8-12 轮' },
-  { key: 'behavioral', label: '行为面试', desc: 'STAR 软技能专项训练', rounds: '6-8 轮' },
+  { key: 'behavioral', label: '行为面试', desc: 'STAR 软技能专项训练', rounds: '6-8 轮', note: 'DeepSeek 下可能偏技术提问，建议切换 Claude API' },
   { key: 'comprehensive', label: '综合模拟', desc: '全流程真实面试', rounds: '12-15 轮' },
 ];
 
@@ -174,6 +174,9 @@ function SetupContent() {
                 <span className="text-xs text-gray-400">{m.rounds}</span>
               </div>
               <div className="text-xs text-gray-500 mt-0.5">{m.desc}</div>
+              {m.note && (
+                <div className="text-[11px] text-amber-600 mt-1 bg-amber-50 rounded px-2 py-0.5">{m.note}</div>
+              )}
             </button>
           ))}
         </div>

@@ -22,6 +22,7 @@ export async function GET(_req: NextRequest) {
       } catch {}
       return {
         id: s.id,
+        resumeId: s.resumeId,
         mode: s.mode,
         difficulty: s.difficulty,
         status: s.status,

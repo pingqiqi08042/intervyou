@@ -43,7 +43,7 @@ function OptimizeContent() {
       .then((d) => {
         const related = (d.sessions || []).filter((s: any) => {
           // 找到属于当前简历的 session（通过 name 匹配不太准确，简单全量返回）
-          return s.status === 'completed';
+          return s.status === 'completed' && s.resumeId === selectedId;
         });
         setSessions(related);
         if (related.length) setSelectedSessionId(related[0].id);

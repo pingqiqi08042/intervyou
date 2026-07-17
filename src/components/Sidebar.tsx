@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ApiKeySettings from '@/components/ApiKeySettings';
@@ -28,16 +28,12 @@ export default function Sidebar() {
 
       <nav className="p-3 space-y-0.5 border-t border-gray-100">
         {NAV_ITEMS.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            onClick={() => setMobileOpen(false)}
+          <Link key={href} href={href} onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               pathname === href || (href !== '/' && pathname.startsWith(href))
                 ? 'bg-gray-100 text-gray-900 font-medium'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
+            }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${pathname === href || (href !== '/' && pathname.startsWith(href)) ? 'bg-blue-500' : 'bg-current opacity-40'}`} />
             <span>{label}</span>
           </Link>
@@ -46,6 +42,8 @@ export default function Sidebar() {
 
       <ApiKeySettings />
       <div className="flex-1" />
+
+      <VisitorCounter />
 
       <div className="p-4 border-t border-gray-100">
         <p className="text-xs text-gray-400 leading-relaxed">
@@ -57,15 +55,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
       <div className="hidden md:block shrink-0">{sidebar}</div>
-
-      {/* Mobile hamburger + drawer */}
       <div className="md:hidden">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="fixed top-3 left-3 z-40 w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm"
-        >
+        <button onClick={() => setMobileOpen(true)}
+          className="fixed top-3 left-3 z-40 w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
           </svg>
@@ -78,5 +71,19 @@ export default function Sidebar() {
         )}
       </div>
     </>
+  );
+}
+
+function VisitorCounter() {
+  const [count, setCount] = useState<{ total: number; today: number } | null>(null);
+  useEffect(() => {
+    fetch('/api/visitor?path=' + encodeURIComponent(window.location.pathname))
+      .then((r) => r.json()).then(setCount).catch(() => {});
+  }, []);
+  if (!count) return null;
+  return (
+    <div className="p-3 border-t border-gray-100">
+      <p className="text-[10px] text-gray-400 text-center">今日访问 {count.today} · 总计 {count.total}</p>
+    </div>
   );
 }

@@ -289,14 +289,19 @@ export function buildSystemPromptV2(params: BuildPromptV2Params): string {
   const hasResume = resume.experiences?.length > 0 || resume.skills?.length > 0;
   const hasMaterials = hasResume || (jdText && jdText.length > 20);
 
+  // 行为面试：简历只保留公司/项目名+角色，去掉项目细节
+  const isBehavioral = interviewMode === 'behavioral';
   const resumeCompact = hasResume ? JSON.stringify({
     name: resume.name,
     education: resume.education.map((e) => `${e.school} ${e.degree} ${e.major}`),
     experiences: resume.experiences.map((e) => ({
-      company: e.company, role: e.role, highlights: e.highlights, description: e.description,
+      company: e.company,
+      role: e.role,
+      ...(isBehavioral ? {} : { highlights: e.highlights, description: e.description }),
     })),
     projects: resume.projects.map((p) => ({
-      name: p.name, description: p.description, highlights: p.highlights,
+      name: p.name,
+      ...(isBehavioral ? {} : { description: p.description, highlights: p.highlights }),
     })),
     skills: resume.skills,
   }, null, 1) : '(无简历)';

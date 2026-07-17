@@ -293,6 +293,7 @@ export interface BuildPromptV2Params {
 
 export function buildSystemPromptV2(params: BuildPromptV2Params): string {
   const { resume, mode, jdTitle, jdText, jobRole, interviewMode, questionIndex, currentPhase } = params;
+  const isBehavioral = interviewMode === 'behavioral';
 
   let effectiveRole: JobRole = '后端开发';
   let roleSource = '';
@@ -337,7 +338,17 @@ export function buildSystemPromptV2(params: BuildPromptV2Params): string {
     skills: resume.skills,
   }, null, 1) : '(无简历)';
 
-  return `# 最优先规则（违反 = 面试失败）
+  // 行为面试：在最顶部强制注入一条不可忽视的指令
+  const behavioralTopRule = isBehavioral ? `# ⚠ 本次是行为面试（软技能面试）⚠
+
+你的第一句话必须是：自我介绍寒暄 + 一个行为问题。
+行为问题示例："你在XX实习时，有没有和同事意见不一致的情况？"
+绝对禁止问你任何关于项目背景、技术细节、你负责了什么的问题。
+如果你第一句话问了项目，你就完全搞砸了这次面试。
+---
+` : '';
+
+  return `${behavioralTopRule}# 最优先规则（违反 = 面试失败）
 
 1. **一次只问一个问题**。
 2. **绝不允许重复提问**。检查上一轮问了什么，这一轮必须不同。
